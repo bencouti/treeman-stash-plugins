@@ -315,8 +315,8 @@ class ConfigManager:
             log.error("No valid stash box endpoints found in configuration!")
             return {}
         
-    log.info(f"Configured sources: {list(sources.keys())}")
-    return sources
+        log.info(f"Configured sources: {list(sources.keys())}")
+        return sources
 
     def get_enabled_sources(self) -> List[str]:
         """Get list of enabled source names"""

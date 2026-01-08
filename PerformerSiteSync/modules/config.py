@@ -260,7 +260,7 @@ class ConfigManager:
             
             for i, box in enumerate(stash_boxes):
                 endpoint_url = box.get('endpoint', '')
-                api_key = box.get('apikey', '')
+                api_key = box.get('api_key', '')
                 name = box.get('name', '')
                 
                 log.info(f"Stash box {i}: name='{name}', endpoint='{endpoint_url}', has_api_key={bool(api_key)}")
@@ -297,12 +297,14 @@ class ConfigManager:
     def _build_sources_config(self) -> Dict[str, Dict[str, Any]]:
         """Build sources configuration with precedence based on plugin settings"""
         sources = {}
-        precedence_order = [s.strip() for s in self.plugin_config["sourcePrecedence"].split(",")]
+        precedence_order = [s.strip().lower() for s in self.plugin_config["sourcePrecedence"].split(",")]
+        log.info(f"Endpoints available: {self.endpoints}")
+        log.info(f"Source precedence order: {precedence_order}")
         
         for i, source in enumerate(precedence_order, 1):
             if source in self.endpoints:
                 # Check if source is enabled in plugin config
-                enable_key = f"enable{source.upper()}" if source != 'tpdb' else 'enableTPDB'
+                enable_key = f"enable{source.capitalize()}" if source != 'tpdb' else 'enableTPDB'
                 if self.plugin_config.get(enable_key, True):
                     sources[source] = {
                         'precedence': i,
@@ -312,9 +314,9 @@ class ConfigManager:
         if not sources:
             log.error("No valid stash box endpoints found in configuration!")
             return {}
-            
-        log.info(f"Configured sources: {list(sources.keys())}")
-        return sources
+        
+    log.info(f"Configured sources: {list(sources.keys())}")
+    return sources
 
     def get_enabled_sources(self) -> List[str]:
         """Get list of enabled source names"""
